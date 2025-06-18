@@ -34,6 +34,11 @@ ENV NODE_ENV=production
 # Disable Next.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# NextAuth.js Configuration
+ENV NEXTAUTH_URL="http://localhost:3001"
+ENV NEXTAUTH_SECRET="teen-budget-tracker-production-secret-2024"
+ENV DATABASE_URL="file:/app/data/teen-budget.db"
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
@@ -54,6 +59,10 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
+# Copy startup script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
 # Create data directory for SQLite database
 RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
 
@@ -64,5 +73,5 @@ EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
 
-# Start the application
-CMD ["node", "server.js"]
+# Start the application with initialization
+CMD ["/app/docker-entrypoint.sh"]

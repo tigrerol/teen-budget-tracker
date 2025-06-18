@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/session-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { DashboardLayoutClient } from "@/components/layout/dashboard-layout-client";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,7 +35,9 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
           <QueryProvider>
-            {children}
+            <DashboardLayoutClient>
+              {children}
+            </DashboardLayoutClient>
           </QueryProvider>
         </AuthProvider>
       </body>

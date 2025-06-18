@@ -1,0 +1,15 @@
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+
+export default async function Home() {
+  const session = await getServerSession(authOptions)
+  
+  if (!session) {
+    redirect('/auth/signin')
+  }
+
+  // This page will be handled by the (dashboard) layout and page
+  // Since we're in the root and authenticated, Next.js will render the (dashboard)/page.tsx
+  return null
+}
