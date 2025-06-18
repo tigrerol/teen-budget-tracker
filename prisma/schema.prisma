@@ -77,7 +77,12 @@ model Category {
   // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
-  budgets      Budget[]
+  budgetItems  BudgetItem[]
+
+  // Indexes for performance
+  @@index([userId])
+  @@index([type])
+  @@unique([userId, name]) // Prevent duplicate category names per user
 }
 
 model Transaction {
@@ -95,23 +100,51 @@ model Transaction {
   // Relations
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  // Indexes for performance optimization
+  @@index([userId, date]) // Primary query pattern: user's transactions by date
+  @@index([categoryId])   // Filter by category
+  @@index([type])         // Filter by income/expense
+  @@index([userId, type]) // Combined user + type queries
 }
 
 model Budget {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "January 2024 Budget", "Monthly Budget"
+  period      String   // "MONTHLY" | "WEEKLY" | "YEARLY"
+  startDate   DateTime
+  endDate     DateTime
+  userId      String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  budgetItems BudgetItem[]
+
+  // Indexes for performance
+  @@index([userId])
+  @@index([userId, period])
+  @@index([userId, isActive])
+}
+
+model BudgetItem {
   id         String   @id @default(cuid())
-  amount     Float
-  period     String   // "MONTHLY" | "WEEKLY" | "DAILY"
+  budgetId   String
   categoryId String
-  userId     String
-  startDate  DateTime
-  endDate    DateTime
+  amount     Float
+  type       String   // "INCOME" | "EXPENSE"
+  notes      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   // Relations
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  budget   Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  // Prevent duplicate budgets for same category and period
-  @@unique([categoryId, period, startDate])
+  // Indexes for performance
+  @@index([budgetId])
+  @@index([budgetId, type])
+  @@unique([budgetId, categoryId]) // One budget item per category per budget
 }

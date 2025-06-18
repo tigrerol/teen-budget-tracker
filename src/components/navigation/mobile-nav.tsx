@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { 
   Home, 
   PiggyBank, 
-  Tags, 
+  Receipt, 
   BarChart3, 
   Trophy 
 } from 'lucide-react'
@@ -18,14 +18,14 @@ const navItems = [
     icon: Home,
   },
   {
+    label: 'Transactions',
+    href: '/transactions',
+    icon: Receipt,
+  },
+  {
     label: 'Budget',
     href: '/budget',
     icon: PiggyBank,
-  },
-  {
-    label: 'Categories',
-    href: '/categories',
-    icon: Tags,
   },
   {
     label: 'Analytics',

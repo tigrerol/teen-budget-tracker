@@ -3,28 +3,33 @@
 import { useSession } from 'next-auth/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { formatCurrency } from '@/lib/currency'
+import { TransactionForm } from '@/components/transactions/transaction-form'
+import { useTransactionStats } from '@/hooks/use-transaction-stats'
+import { useRecentTransactions } from '@/hooks/use-recent-transactions'
 import { 
   PiggyBank, 
   TrendingUp, 
   TrendingDown, 
   Target,
-  Plus
+  Plus,
+  Loader2
 } from 'lucide-react'
+import { format } from 'date-fns'
 
 export default function DashboardPage() {
   const { data: session } = useSession()
+  const { data: stats, isLoading: statsLoading, error: statsError } = useTransactionStats()
+  const { data: recentTransactions = [], isLoading: transactionsLoading } = useRecentTransactions(3)
 
-  // Mock data for now - will be replaced with real data
-  const mockData = {
-    totalBalance: 245.50,
-    monthlyIncome: 150.00,
-    monthlyExpenses: 89.50,
+  // Mock savings goal data (to be replaced when budgets are implemented)
+  const mockSavingsData = {
     savingsGoal: 500.00,
-    currentSavings: 156.00,
+    currentSavings: stats?.totalBalance || 0,
   }
 
-  const savingsProgress = (mockData.currentSavings / mockData.savingsGoal) * 100
+  const savingsProgress = (mockSavingsData.currentSavings / mockSavingsData.savingsGoal) * 100
 
   return (
     <div className="space-y-6">
@@ -38,13 +43,25 @@ export default function DashboardPage() {
             Here&apos;s your financial overview for this month
           </p>
         </div>
-        <Button className="md:w-auto">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Transaction
-        </Button>
+        <TransactionForm
+          trigger={
+            <Button className="md:w-auto">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Transaction
+            </Button>
+          }
+        />
       </div>
 
       {/* Summary Cards */}
+      {statsError && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load dashboard data. Please try refreshing the page.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -52,12 +69,28 @@ export default function DashboardPage() {
             <PiggyBank className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {formatCurrency(mockData.totalBalance)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              +2.1% from last month
-            </p>
+            {statsLoading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-primary">
+                  {formatCurrency(stats?.totalBalance || 0)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {stats?.balanceChangePercent !== undefined && stats.balanceChangePercent !== 0 ? (
+                    <>
+                      {stats.balanceChangePercent > 0 ? '+' : ''}
+                      {stats.balanceChangePercent.toFixed(1)}% from last month
+                    </>
+                  ) : (
+                    'All-time balance'
+                  )}
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -67,12 +100,21 @@ export default function DashboardPage() {
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(mockData.monthlyIncome)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Allowance + part-time work
-            </p>
+            {statsLoading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-green-600">
+                  {formatCurrency(stats?.monthlyIncome || 0)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This month's income
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -82,12 +124,24 @@ export default function DashboardPage() {
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {formatCurrency(mockData.monthlyExpenses)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              60% of income spent
-            </p>
+            {statsLoading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-red-600">
+                  {formatCurrency(stats?.monthlyExpenses || 0)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {stats?.monthlyIncome && stats.monthlyIncome > 0 
+                    ? `${Math.round((stats.monthlyExpenses / stats.monthlyIncome) * 100)}% of income spent`
+                    : 'This month\'s expenses'
+                  }
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -97,12 +151,21 @@ export default function DashboardPage() {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(mockData.currentSavings)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {savingsProgress.toFixed(1)}% of {formatCurrency(mockData.savingsGoal)} goal
-            </p>
+            {statsLoading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(mockSavingsData.currentSavings)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {savingsProgress.toFixed(1)}% of {formatCurrency(mockSavingsData.savingsGoal)} goal
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -114,46 +177,42 @@ export default function DashboardPage() {
             <CardTitle>Recent Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                    🍔
-                  </div>
-                  <div>
-                    <p className="font-medium">Lunch with friends</p>
-                    <p className="text-sm text-muted-foreground">Food & Drinks</p>
-                  </div>
-                </div>
-                <span className="font-medium text-red-600">-{formatCurrency(15.50)}</span>
+            {transactionsLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading transactions...</span>
               </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                    💰
-                  </div>
-                  <div>
-                    <p className="font-medium">Weekly allowance</p>
-                    <p className="text-sm text-muted-foreground">Taschengeld</p>
-                  </div>
-                </div>
-                <span className="font-medium text-green-600">+{formatCurrency(25.00)}</span>
+            ) : recentTransactions.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground">No transactions yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Add your first transaction to get started</p>
               </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    👕
+            ) : (
+              <div className="space-y-4">
+                {recentTransactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                        transaction.category.color || 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {transaction.category.icon || '📦'}
+                      </div>
+                      <div>
+                        <p className="font-medium">{transaction.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {transaction.category.name} • {format(new Date(transaction.date), 'MMM dd')}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`font-medium ${
+                      transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                    </span>
                   </div>
-                  <div>
-                    <p className="font-medium">New t-shirt</p>
-                    <p className="text-sm text-muted-foreground">Clothes</p>
-                  </div>
-                </div>
-                <span className="font-medium text-red-600">-{formatCurrency(29.99)}</span>
+                ))}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
