@@ -5,15 +5,17 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 
-export default function Home() {
+interface AuthGuardProps {
+  children: React.ReactNode
+}
+
+export function AuthGuard({ children }: AuthGuardProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/signin')
-    } else if (status === 'authenticated') {
-      router.push('/dashboard')
     }
   }, [status, router])
 
@@ -30,5 +32,9 @@ export default function Home() {
     )
   }
 
-  return null // Will redirect
+  if (status === 'unauthenticated') {
+    return null // Will redirect to sign in
+  }
+
+  return <>{children}</>
 }
