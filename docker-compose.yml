@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  teen-budget-tracker:
+    build: .
+    container_name: teen-budget-tracker
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/teen-budget.db
+      - NEXTAUTH_URL=http://localhost:3001
+      - NEXTAUTH_SECRET=your-super-secret-key-change-in-production
+      # Optional OAuth providers (uncomment and set if needed)
+      # - GOOGLE_CLIENT_ID=your_google_client_id
+      # - GOOGLE_CLIENT_SECRET=your_google_client_secret
+      # - GITHUB_ID=your_github_client_id
+      # - GITHUB_SECRET=your_github_client_secret
+    volumes:
+      - teen_budget_data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/auth/session"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  teen_budget_data:
+    driver: local
