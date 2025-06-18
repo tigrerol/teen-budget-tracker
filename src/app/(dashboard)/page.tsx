@@ -35,7 +35,7 @@ export default function DashboardPage() {
             Welcome back, {session?.user?.name || 'Demo User'}! 👋
           </h1>
           <p className="text-muted-foreground">
-            Here's your financial overview for this month
+            Here&apos;s your financial overview for this month
           </p>
         </div>
         <Button className="md:w-auto">
