@@ -8,7 +8,8 @@ import {
   PiggyBank, 
   Receipt, 
   BarChart3, 
-  Trophy 
+  Trophy,
+  Tags
 } from 'lucide-react'
 
 const navItems = [
@@ -21,6 +22,11 @@ const navItems = [
     label: 'Transactions',
     href: '/transactions',
     icon: Receipt,
+  },
+  {
+    label: 'Categories',
+    href: '/categories',
+    icon: Tags,
   },
   {
     label: 'Budget',
@@ -44,7 +50,7 @@ export function MobileNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
-      <div className="grid grid-cols-5 h-16">
+      <div className="grid grid-cols-6 h-16">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href || 

@@ -12,7 +12,8 @@ import {
   BarChart3, 
   Trophy,
   LogOut,
-  User
+  User,
+  Tags
 } from 'lucide-react'
 
 const navItems = [
@@ -25,6 +26,11 @@ const navItems = [
     label: 'Transactions',
     href: '/transactions',
     icon: Receipt,
+  },
+  {
+    label: 'Categories',
+    href: '/categories',
+    icon: Tags,
   },
   {
     label: 'Budget',

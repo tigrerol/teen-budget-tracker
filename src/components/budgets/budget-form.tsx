@@ -366,7 +366,7 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
                       {category?.icon || '💰'}
                     </div>
                     
-                    <div className="flex-1 grid gap-4 md:grid-cols-3">
+                    <div className="flex-1 grid gap-4 md:grid-cols-4">
                       <Select
                         value={item.categoryId}
                         onValueChange={(value) => updateBudgetItem(actualIndex, { categoryId: value })}
@@ -466,7 +466,7 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
                       {category?.icon || '💸'}
                     </div>
                     
-                    <div className="flex-1 grid gap-4 md:grid-cols-3">
+                    <div className="flex-1 grid gap-4 md:grid-cols-4">
                       <Select
                         value={item.categoryId}
                         onValueChange={(value) => updateBudgetItem(actualIndex, { categoryId: value })}
