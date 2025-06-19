@@ -10,8 +10,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Checkbox } from '@/components/ui/checkbox'
 import { formatCurrency } from '@/lib/currency'
-import { Plus, Loader2 } from 'lucide-react'
+import { useSavingsGoal } from '@/hooks/use-savings-goal'
+import { Plus, Loader2, Target } from 'lucide-react'
 import { z } from 'zod'
 
 interface TransactionFormProps {
@@ -35,6 +37,8 @@ interface TransactionFormData {
   date: string
   categoryId: string
   receiptUrl?: string
+  savingsGoalId?: string
+  isForSavingsGoal: boolean
 }
 
 export function TransactionForm({ trigger, transactionId, onSuccess }: TransactionFormProps) {
@@ -49,8 +53,13 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
     date: new Date().toISOString().split('T')[0], // Today's date
     categoryId: '',
     receiptUrl: '',
+    savingsGoalId: '',
+    isForSavingsGoal: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Fetch active savings goal
+  const { data: savingsGoal } = useSavingsGoal()
 
   // Fetch categories
   const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = useQuery({
@@ -92,9 +101,24 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
         date: new Date(existingTransaction.date).toISOString().split('T')[0],
         categoryId: existingTransaction.categoryId,
         receiptUrl: existingTransaction.receiptUrl || '',
+        savingsGoalId: existingTransaction.savingsGoalId || '',
+        isForSavingsGoal: !!existingTransaction.savingsGoalId,
       })
     }
   }, [existingTransaction])
+
+  // Handle savings goal checkbox change
+  const handleSavingsGoalChange = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      isForSavingsGoal: checked,
+      savingsGoalId: checked && savingsGoal ? savingsGoal.id : '',
+      // Auto-select "Savings" category if available and switching to savings goal
+      categoryId: checked && prev.type === 'INCOME' ? (
+        categories.find(cat => cat.name === 'Savings' && cat.type === 'INCOME')?.id || prev.categoryId
+      ) : prev.categoryId,
+    }))
+  }
 
   // Create transaction mutation
   const createMutation = useMutation({
@@ -108,6 +132,7 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
           ...data,
           amount: parseFloat(data.amount),
           date: new Date(data.date).toISOString(),
+          savingsGoalId: data.isForSavingsGoal ? data.savingsGoalId : undefined,
         }),
       })
       
@@ -121,6 +146,7 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['savings-goal'] })
       setOpen(false)
       resetForm()
       onSuccess?.()
@@ -142,6 +168,7 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
           ...data,
           amount: parseFloat(data.amount),
           date: new Date(data.date).toISOString(),
+          savingsGoalId: data.isForSavingsGoal ? data.savingsGoalId : undefined,
         }),
       })
       
@@ -156,6 +183,7 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['transaction', transactionId] })
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['savings-goal'] })
       setOpen(false)
       onSuccess?.()
     },
@@ -172,6 +200,8 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
       date: new Date().toISOString().split('T')[0],
       categoryId: '',
       receiptUrl: '',
+      savingsGoalId: '',
+      isForSavingsGoal: false,
     })
     setErrors({})
   }
@@ -339,6 +369,35 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
                 Debug: {categories.length} total categories, {filteredCategories.length} {formData.type.toLowerCase()} categories
               </p>
             </div>
+
+            {/* Savings Goal */}
+            {savingsGoal && formData.type === 'INCOME' && (
+              <div className="space-y-3 p-3 border rounded-lg bg-emerald-50">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="savings-goal"
+                    checked={formData.isForSavingsGoal}
+                    onCheckedChange={handleSavingsGoalChange}
+                  />
+                  <Label htmlFor="savings-goal" className="flex items-center space-x-2 cursor-pointer">
+                    <Target className="h-4 w-4 text-emerald-600" />
+                    <span>Count toward savings goal</span>
+                  </Label>
+                </div>
+                {formData.isForSavingsGoal && (
+                  <div className="ml-6 text-sm text-emerald-700">
+                    <p className="font-medium">{savingsGoal.title}</p>
+                    <p>Progress: {formatCurrency(savingsGoal.currentAmount || 0)} / {formatCurrency(savingsGoal.targetAmount)}</p>
+                    <div className="w-full bg-emerald-200 rounded-full h-1.5 mt-1">
+                      <div 
+                        className="bg-emerald-600 h-1.5 rounded-full transition-all duration-300" 
+                        style={{ width: `${Math.min(savingsGoal.progress || 0, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Description */}
             <div className="space-y-2">

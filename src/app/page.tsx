@@ -8,6 +8,8 @@ import { formatCurrency } from '@/lib/currency'
 import { TransactionForm } from '@/components/transactions/transaction-form'
 import { useTransactionStats } from '@/hooks/use-transaction-stats'
 import { useRecentTransactions } from '@/hooks/use-recent-transactions'
+import { useSavingsGoal } from '@/hooks/use-savings-goal'
+import { SavingsGoalForm } from '@/components/savings/savings-goal-form'
 import { 
   PiggyBank, 
   TrendingUp, 
@@ -22,14 +24,7 @@ export default function DashboardPage() {
   const { data: session } = useSession()
   const { data: stats, isLoading: statsLoading, error: statsError } = useTransactionStats()
   const { data: recentTransactions = [], isLoading: transactionsLoading } = useRecentTransactions(3)
-
-  // Mock savings goal data (to be replaced when budgets are implemented)
-  const mockSavingsData = {
-    savingsGoal: 500.00,
-    currentSavings: stats?.totalBalance || 0,
-  }
-
-  const savingsProgress = (mockSavingsData.currentSavings / mockSavingsData.savingsGoal) * 100
+  const { data: savingsGoal, isLoading: savingsLoading } = useSavingsGoal()
 
   return (
     <div className="space-y-6">
@@ -145,26 +140,57 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Savings Goal</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {statsLoading ? (
+            {savingsLoading ? (
               <div className="flex items-center space-x-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm text-muted-foreground">Loading...</span>
               </div>
-            ) : (
+            ) : savingsGoal ? (
               <>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(mockSavingsData.currentSavings)}
+                <div className="text-2xl font-bold text-emerald-600">
+                  {formatCurrency(savingsGoal.currentAmount || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {savingsProgress.toFixed(1)}% of {formatCurrency(mockSavingsData.savingsGoal)} goal
+                  {savingsGoal.progress?.toFixed(1)}% of {formatCurrency(savingsGoal.targetAmount)} goal
                 </p>
+                <div className="mt-2">
+                  <div className="w-full bg-emerald-100 rounded-full h-2">
+                    <div 
+                      className="bg-emerald-600 h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${Math.min(savingsGoal.progress || 0, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-xs font-medium text-emerald-700">{savingsGoal.title}</span>
+                  <SavingsGoalForm
+                    savingsGoalId={savingsGoal.id}
+                    trigger={
+                      <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                        Edit
+                      </button>
+                    }
+                  />
+                </div>
               </>
+            ) : (
+              <div className="text-center py-2">
+                <div className="text-lg font-medium text-muted-foreground mb-2">No active goal</div>
+                <SavingsGoalForm
+                  trigger={
+                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+                      <Plus className="mr-2 h-3 w-3" />
+                      Create Goal
+                    </Button>
+                  }
+                />
+              </div>
             )}
           </CardContent>
         </Card>

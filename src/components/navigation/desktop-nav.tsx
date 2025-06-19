@@ -28,25 +28,26 @@ const navItems = [
     icon: Receipt,
   },
   {
-    label: 'Categories',
-    href: '/categories',
-    icon: Tags,
-  },
-  {
     label: 'Budget',
     href: '/budget',
     icon: PiggyBank,
   },
   {
-    label: 'Analytics',
-    href: '/analytics',
-    icon: BarChart3,
+    label: 'Categories',
+    href: '/categories',
+    icon: Tags,
   },
-  {
-    label: 'Achievements',
-    href: '/achievements',
-    icon: Trophy,
-  },
+  // Temporarily disabled
+  // {
+  //   label: 'Analytics',
+  //   href: '/analytics',
+  //   icon: BarChart3,
+  // },
+  // {
+  //   label: 'Achievements',
+  //   href: '/achievements',
+  //   icon: Trophy,
+  // },
 ]
 
 export function DesktopNav() {

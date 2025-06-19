@@ -194,7 +194,6 @@ export async function POST(request: NextRequest) {
             categoryId: item.categoryId,
             amount: item.amount,
             type: item.type,
-            notes: item.notes || null,
           })),
         },
       },

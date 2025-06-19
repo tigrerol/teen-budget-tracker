@@ -62,6 +62,7 @@ model User {
   categories   Category[]
   transactions Transaction[]
   budgets      Budget[]
+  savingsGoals SavingsGoal[]
 }
 
 model Category {
@@ -91,15 +92,17 @@ model Transaction {
   type        String   // "INCOME" | "EXPENSE"
   description String
   date        DateTime
-  categoryId  String
-  userId      String
-  receiptUrl  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  categoryId    String
+  userId        String
+  savingsGoalId String?
+  receiptUrl    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  savingsGoal SavingsGoal? @relation(fields: [savingsGoalId], references: [id], onDelete: SetNull)
 
   // Indexes for performance optimization
   @@index([userId, date]) // Primary query pattern: user's transactions by date
@@ -135,7 +138,6 @@ model BudgetItem {
   categoryId String
   amount     Float
   type       String   // "INCOME" | "EXPENSE"
-  notes      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -147,4 +149,24 @@ model BudgetItem {
   @@index([budgetId])
   @@index([budgetId, type])
   @@unique([budgetId, categoryId]) // One budget item per category per budget
+}
+
+model SavingsGoal {
+  id           String   @id @default(cuid())
+  userId       String
+  title        String   // e.g., "New Laptop", "Vacation Fund"
+  description  String?  // Optional details
+  targetAmount Float    // Goal amount to reach
+  deadline     DateTime? // Optional target date
+  status       String   @default("ACTIVE") // ACTIVE | ACHIEVED | DISCARDED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  // Indexes for performance
+  @@index([userId])
+  @@index([userId, status])
 }

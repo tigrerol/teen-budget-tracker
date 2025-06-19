@@ -187,7 +187,6 @@ export async function PUT(
             categoryId: item.categoryId,
             amount: item.amount,
             type: item.type,
-            notes: item.notes || null,
           })),
         })
       }
