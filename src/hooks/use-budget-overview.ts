@@ -72,12 +72,17 @@ export function useBudgetOverview() {
           if (budgetItem.type !== 'EXPENSE') continue // Only show expense categories in overview
           
           // Calculate actual spending for this category in the budget period
-          const relevantTransactions = transactions.filter(transaction => 
-            transaction.categoryId === budgetItem.categoryId &&
-            transaction.type === 'EXPENSE' &&
-            new Date(transaction.date) >= new Date(budget.startDate) &&
-            new Date(transaction.date) <= new Date(budget.endDate)
-          )
+          const budgetStart = new Date(budget.startDate)
+          const budgetEnd = new Date(budget.endDate)
+          
+          const relevantTransactions = transactions.filter(transaction => {
+            const transactionDate = new Date(transaction.date)
+            const matchesCategory = transaction.categoryId === budgetItem.categoryId
+            const matchesType = transaction.type === 'EXPENSE'
+            const withinDateRange = transactionDate >= budgetStart && transactionDate <= budgetEnd
+            
+            return matchesCategory && matchesType && withinDateRange
+          })
           
           const spentAmount = relevantTransactions.reduce((sum, t) => sum + t.amount, 0)
           const budgetAmount = budgetItem.amount

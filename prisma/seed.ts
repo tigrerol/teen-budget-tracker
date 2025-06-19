@@ -53,6 +53,70 @@ async function createDefaultCategories(userId: string) {
   }
 }
 
+async function createSampleBudgets(userId: string) {
+  console.log('Creating sample budgets for user:', userId)
+  
+  // Get some categories for budget creation
+  const expenseCategories = await prisma.category.findMany({
+    where: { userId, type: 'EXPENSE' }
+  })
+  
+  const incomeCategories = await prisma.category.findMany({
+    where: { userId, type: 'INCOME' }
+  })
+  
+  if (expenseCategories.length === 0 || incomeCategories.length === 0) {
+    console.log('No categories found, skipping budget creation')
+    return
+  }
+  
+  // Create a monthly budget for current month
+  const now = new Date()
+  const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+  const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  
+  try {
+    const budget = await prisma.budget.create({
+      data: {
+        name: 'Monthly Budget',
+        period: 'MONTHLY',
+        startDate,
+        endDate,
+        isActive: true,
+        userId,
+        budgetItems: {
+          create: [
+            {
+              categoryId: expenseCategories.find((c: any) => c.name === 'Food & Drinks')?.id || expenseCategories[0].id,
+              amount: 100.00,
+              type: 'EXPENSE'
+            },
+            {
+              categoryId: expenseCategories.find((c: any) => c.name === 'Clothes')?.id || expenseCategories[1]?.id || expenseCategories[0].id,
+              amount: 80.00,
+              type: 'EXPENSE'
+            },
+            {
+              categoryId: expenseCategories.find((c: any) => c.name === 'Entertainment')?.id || expenseCategories[2]?.id || expenseCategories[0].id,
+              amount: 50.00,
+              type: 'EXPENSE'
+            },
+            {
+              categoryId: incomeCategories.find((c: any) => c.name === 'Allowance')?.id || incomeCategories[0].id,
+              amount: 200.00,
+              type: 'INCOME'
+            }
+          ]
+        }
+      }
+    })
+    
+    console.log('Created sample budget:', budget.name)
+  } catch (error) {
+    console.error('Failed to create sample budget:', error)
+  }
+}
+
 async function createSampleData(userId: string) {
   console.log('Creating sample transactions for user:', userId)
   
@@ -178,6 +242,11 @@ async function main() {
   await createDefaultCategories(demoUser.id)
   await createDefaultCategories(viola.id)
   await createDefaultCategories(dominic.id)
+  
+  // Create sample budgets for all users
+  await createSampleBudgets(demoUser.id)
+  await createSampleBudgets(viola.id)
+  await createSampleBudgets(dominic.id)
   
   // Create sample data for all users
   await createSampleData(demoUser.id)
