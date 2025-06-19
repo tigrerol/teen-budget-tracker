@@ -52,7 +52,7 @@ export function useBudgetOverview() {
       
       // Fetch transactions for the full budget period range
       const transactionsResponse = await fetch(
-        `/api/transactions?startDate=${earliestDate.toISOString()}&endDate=${latestDate.toISOString()}&limit=1000`
+        `/api/transactions?startDate=${earliestDate.toISOString()}&endDate=${latestDate.toISOString()}&limit=100`
       )
       
       const transactionResult = transactionsResponse.ok 

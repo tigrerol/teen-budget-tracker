@@ -1,12 +1,13 @@
 {
   "name": "teen-budget-tracker",
-  "version": "0.1.0",
+  "version": "1.0.12",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/generate-build-info.js && next build",
     "start": "next start",
     "lint": "next lint",
+    "prebuild": "node scripts/generate-build-info.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

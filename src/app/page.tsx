@@ -11,22 +11,53 @@ import { useRecentTransactions } from '@/hooks/use-recent-transactions'
 import { useSavingsGoal } from '@/hooks/use-savings-goal'
 import { useBudgetOverview } from '@/hooks/use-budget-overview'
 import { SavingsGoalForm } from '@/components/savings/savings-goal-form'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { VersionInfo } from '@/components/ui/version-info'
 import { 
   PiggyBank, 
   TrendingUp, 
   TrendingDown, 
   Target,
   Plus,
-  Loader2
+  Loader2,
+  Trash2
 } from 'lucide-react'
 import { format } from 'date-fns'
 
 export default function DashboardPage() {
   const { data: session } = useSession()
+  const queryClient = useQueryClient()
   const { data: stats, isLoading: statsLoading, error: statsError } = useTransactionStats()
   const { data: recentTransactions = [], isLoading: transactionsLoading } = useRecentTransactions(3)
   const { data: savingsGoal, isLoading: savingsLoading } = useSavingsGoal()
   const { data: budgetOverview = [], isLoading: budgetLoading, error: budgetError } = useBudgetOverview()
+
+  // Delete transaction mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (transactionId: string) => {
+      const response = await fetch(`/api/transactions/${transactionId}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete transaction')
+      }
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transaction-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['budget-overview'] })
+    },
+  })
+
+  // Handle delete
+  const handleDelete = async (transactionId: string) => {
+    if (confirm('Are you sure you want to delete this transaction?')) {
+      deleteMutation.mutate(transactionId)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -232,11 +263,26 @@ export default function DashboardPage() {
                         </p>
                       </div>
                     </div>
-                    <span className={`font-medium ${
-                      transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrency(transaction.amount)}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className={`font-medium ${
+                        transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(transaction.id)}
+                        disabled={deleteMutation.isPending}
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-red-600"
+                      >
+                        {deleteMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -319,20 +365,15 @@ export default function DashboardPage() {
                     </div>
                   )
                 })}
-                
-                {budgetOverview.length > 0 && (
-                  <div className="pt-2 border-t">
-                    <Button variant="outline" size="sm" className="w-full" asChild>
-                      <a href="/budget">
-                        View All Budgets
-                      </a>
-                    </Button>
-                  </div>
-                )}
               </div>
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Version Info Footer */}
+      <div className="mt-8 pt-4 border-t border-border/50">
+        <VersionInfo compact className="justify-center" />
       </div>
     </div>
   )

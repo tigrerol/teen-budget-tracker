@@ -1,0 +1,31 @@
+# Production-specific overrides for Synology NAS deployment
+version: '3.8'
+
+services:
+  teen-budget-tracker:
+    environment:
+      - NEXTAUTH_URL=https://your-domain.com  # Update with your actual domain/IP
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-teen-budget-tracker-production-secret-2024}
+    # Uncomment and configure if you want HTTPS/reverse proxy
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.teen-budget.rule=Host(`budget.your-domain.com`)"
+    #   - "traefik.http.routers.teen-budget.tls=true"
+    #   - "traefik.http.services.teen-budget.loadbalancer.server.port=3001"
+    
+    # Resource limits for NAS environment
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    
+    # Production logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"

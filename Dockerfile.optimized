@@ -1,4 +1,4 @@
-# Simplified Dockerfile that avoids Prisma generation issues
+# Multi-stage build for optimized production image
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
@@ -6,24 +6,21 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+# Install all dependencies (including dev dependencies for build)
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
-# Build the application (skip Prisma generation for now)
+# Build the application
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client before building
+# Generate Prisma client and build Next.js application
 RUN npx prisma generate
-
-# Build Next.js application
-ENV NODE_ENV=production
 RUN npm run build
 
-# Production image, copy all the files and run next
+# Production image
 FROM base AS runner
 WORKDIR /app
 
@@ -36,8 +33,13 @@ ENV DATABASE_URL="file:/app/data/teen-budget.db"
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install runtime dependencies and tools
+RUN apk add --no-cache sqlite
+RUN npm install -g prisma@6.10.0 tsx@4.20.3
+
 # Copy built application
 COPY --from=builder /app/public ./public
+
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
@@ -45,29 +47,18 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma schema for runtime generation
+# Copy Prisma schema and generated client
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# Install required CLI tools for runtime
-RUN apk add --no-cache sqlite
-
-# Switch to root to install npm packages
-USER root
-RUN npm install prisma@6.10.0 tsx@4.20.3 bcryptjs@2.4.3 --no-save
-
-# Create npm cache directory with correct permissions
-RUN mkdir -p /home/nextjs/.npm && chown -R nextjs:nodejs /home/nextjs/.npm
-
-# Prisma client is already generated during build
-
-# Copy startup script and set permissions while still root
+# Copy startup script
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
 # Create data directory
 RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
 
-# Switch back to nextjs user
 USER nextjs
 
 EXPOSE 3001

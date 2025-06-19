@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  teen-budget-tracker:
+    image: tigreroll/teen-budget-tracker:v1.0.12
+    container_name: teen-budget-tracker
+    restart: unless-stopped
+    ports:
+      - "3001:3001"  # Keep original port mapping as it was working
+    volumes:
+      - teen_budget_data:/app/data
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/teen-budget.db
+      - NEXTAUTH_URL=https://budget.lechner.guru  # Use your actual WebStation URL
+      - NEXTAUTH_SECRET=teen-budget-tracker-production-secret-2024
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://0.0.0.0:3001/api/auth/users"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  teen_budget_data:
+    driver: local
