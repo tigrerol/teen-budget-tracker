@@ -9,6 +9,7 @@ import { TransactionForm } from '@/components/transactions/transaction-form'
 import { useTransactionStats } from '@/hooks/use-transaction-stats'
 import { useRecentTransactions } from '@/hooks/use-recent-transactions'
 import { useSavingsGoal } from '@/hooks/use-savings-goal'
+import { useBudgetOverview } from '@/hooks/use-budget-overview'
 import { SavingsGoalForm } from '@/components/savings/savings-goal-form'
 import { 
   PiggyBank, 
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   const { data: stats, isLoading: statsLoading, error: statsError } = useTransactionStats()
   const { data: recentTransactions = [], isLoading: transactionsLoading } = useRecentTransactions(3)
   const { data: savingsGoal, isLoading: savingsLoading } = useSavingsGoal()
+  const { data: budgetOverview = [], isLoading: budgetLoading, error: budgetError } = useBudgetOverview()
 
   return (
     <div className="space-y-6">
@@ -247,37 +249,88 @@ export default function DashboardPage() {
             <CardTitle>Budget Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Food & Drinks</span>
-                  <span>€45 / €60</span>
-                </div>
-                <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-                </div>
+            {budgetError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>
+                  Failed to load budget overview. Please try refreshing the page.
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {budgetLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading budgets...</span>
               </div>
+            ) : budgetOverview.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground mb-2">No active budgets</p>
+                <p className="text-xs text-muted-foreground mb-4">Create a budget to track your spending</p>
+                <Button size="sm" asChild>
+                  <a href="/budget">
+                    <Plus className="mr-2 h-3 w-3" />
+                    Create Budget
+                  </a>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {budgetOverview.map((item, index) => {
+                  const getProgressColor = () => {
+                    if (item.status === 'over') return 'bg-red-600'
+                    if (item.status === 'near') return 'bg-yellow-600'
+                    return 'bg-green-600'
+                  }
+                  
+                  const getStatusColor = () => {
+                    if (item.status === 'over') return 'text-red-600'
+                    if (item.status === 'near') return 'text-yellow-600'
+                    return 'text-green-600'
+                  }
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Clothes</span>
-                  <span>€89 / €80</span>
-                </div>
-                <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-red-600 h-2 rounded-full" style={{ width: '100%' }}></div>
-                </div>
+                  return (
+                    <div key={`${item.budgetId}-${item.categoryName}-${index}`} className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center space-x-2">
+                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${item.categoryColor}`}>
+                            {item.categoryIcon}
+                          </span>
+                          <span className="font-medium">{item.categoryName}</span>
+                        </div>
+                        <span className={`font-medium ${getStatusColor()}`}>
+                          {formatCurrency(item.spentAmount)} / {formatCurrency(item.budgetAmount)}
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-300 ${getProgressColor()}`}
+                          style={{ width: `${Math.min(item.percentage, 100)}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>{item.percentage.toFixed(1)}% used</span>
+                        <span>
+                          {item.remainingAmount >= 0 
+                            ? `${formatCurrency(item.remainingAmount)} left` 
+                            : `${formatCurrency(Math.abs(item.remainingAmount))} over`
+                          }
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+                
+                {budgetOverview.length > 0 && (
+                  <div className="pt-2 border-t">
+                    <Button variant="outline" size="sm" className="w-full" asChild>
+                      <a href="/budget">
+                        View All Budgets
+                      </a>
+                    </Button>
+                  </div>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Entertainment</span>
-                  <span>€12 / €40</span>
-                </div>
-                <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-yellow-600 h-2 rounded-full" style={{ width: '30%' }}></div>
-                </div>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
