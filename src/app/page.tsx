@@ -224,7 +224,7 @@ export default function DashboardPage() {
                         {transaction.category.icon || '📦'}
                       </div>
                       <div>
-                        <p className="font-medium">{transaction.description}</p>
+                        <p className="font-medium">{transaction.description || 'No description'}</p>
                         <p className="text-sm text-muted-foreground">
                           {transaction.category.name} • {format(new Date(transaction.date), 'MMM dd')}
                         </p>

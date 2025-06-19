@@ -143,6 +143,15 @@ export function CategoryForm({ categoryId, trigger, onSuccess }: CategoryFormPro
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
       setOpen(false)
+      // Reset form data to prevent stale data display
+      if (categoryId) {
+        setFormData({
+          name: '',
+          icon: '📦',
+          color: 'bg-gray-100 text-gray-800',
+          type: 'EXPENSE'
+        })
+      }
       onSuccess?.()
     },
     onError: (error: Error) => {

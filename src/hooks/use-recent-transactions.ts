@@ -5,7 +5,7 @@ interface Transaction {
   id: string
   amount: number
   type: 'INCOME' | 'EXPENSE'
-  description: string
+  description: string | null
   date: string
   category: {
     id: string
