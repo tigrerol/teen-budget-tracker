@@ -53,6 +53,8 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
+  pin           String?   // Hashed PIN for authentication
+  avatar        String?   // Avatar file path or identifier
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

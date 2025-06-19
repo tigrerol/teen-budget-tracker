@@ -2,10 +2,50 @@ import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from './prisma'
+import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    CredentialsProvider({
+      id: 'pin',
+      name: 'PIN Authentication',
+      credentials: {
+        userId: { label: "User ID", type: "text" },
+        pin: { label: "PIN", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.userId || !credentials?.pin) {
+          return null
+        }
+
+        try {
+          const user = await prisma.user.findUnique({
+            where: { id: credentials.userId }
+          })
+
+          if (!user || !user.pin) {
+            return null
+          }
+
+          const isValidPin = await bcrypt.compare(credentials.pin, user.pin)
+          
+          if (!isValidPin) {
+            return null
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.avatar || user.image,
+          }
+        } catch (error) {
+          console.error('PIN auth error:', error)
+          return null
+        }
+      }
+    }),
     CredentialsProvider({
       id: 'demo',
       name: 'Demo Account',

@@ -1,0 +1,49 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+  
+  <!-- Hair -->
+  <path d="M 55 75 C 55 50, 145 50, 145 75 L 145 95 C 140 85, 60 85, 55 95 Z" fill="#1F2937"/>
+  
+  <!-- Face -->
+  <ellipse cx="100" cy="105" rx="45" ry="55" fill="#FBBF93"/>
+  
+  <!-- Hair texture/spikes -->
+  <path d="M 65 70 L 70 60 L 75 70" fill="#1F2937"/>
+  <path d="M 85 65 L 90 55 L 95 65" fill="#1F2937"/>
+  <path d="M 105 65 L 110 55 L 115 65" fill="#1F2937"/>
+  <path d="M 125 70 L 130 60 L 135 70" fill="#1F2937"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="80" cy="100" rx="8" ry="10" fill="#1F2937"/>
+  <ellipse cx="120" cy="100" rx="8" ry="10" fill="#1F2937"/>
+  <circle cx="82" cy="98" r="3" fill="white"/>
+  <circle cx="122" cy="98" r="3" fill="white"/>
+  
+  <!-- Eyebrows -->
+  <rect x="70" y="88" width="20" height="3" rx="1" fill="#1F2937"/>
+  <rect x="110" y="88" width="20" height="3" rx="1" fill="#1F2937"/>
+  
+  <!-- Nose -->
+  <path d="M 100 110 Q 95 120, 100 120" stroke="#E7A977" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Mouth -->
+  <path d="M 85 130 Q 100 135, 115 130" stroke="#374151" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- Stubble/beard shadow (age 17) -->
+  <ellipse cx="100" cy="140" rx="25" ry="15" fill="#1F2937" opacity="0.1"/>
+  
+  <!-- Neck -->
+  <rect x="90" y="150" width="20" height="20" fill="#FBBF93"/>
+  
+  <!-- Shirt collar -->
+  <path d="M 85 165 L 85 170 L 90 175 L 100 170 L 110 175 L 115 170 L 115 165" fill="#1F2937"/>
+  
+  <!-- Shirt -->
+  <path d="M 65 170 L 85 165 L 85 185 L 65 185 Z" fill="#3B82F6"/>
+  <path d="M 115 165 L 135 170 L 135 185 L 115 185 Z" fill="#3B82F6"/>
+  <rect x="85" y="170" width="30" height="15" fill="#3B82F6"/>
+  
+  <!-- Shirt detail -->
+  <line x1="100" y1="170" x2="100" y2="185" stroke="#2563EB" stroke-width="2"/>
+</svg>

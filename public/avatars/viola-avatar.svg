@@ -1,0 +1,40 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#E9D5FF" stroke="#C084FC" stroke-width="2"/>
+  
+  <!-- Hair back -->
+  <path d="M 50 80 C 50 40, 150 40, 150 80 L 150 130 C 150 140, 140 150, 130 150 L 70 150 C 60 150, 50 140, 50 130 Z" fill="#8B5CF6"/>
+  
+  <!-- Face -->
+  <ellipse cx="100" cy="100" rx="45" ry="55" fill="#FBBF93"/>
+  
+  <!-- Hair front/bangs -->
+  <path d="M 60 70 C 70 65, 130 65, 140 70 L 135 85 C 125 80, 75 80, 65 85 Z" fill="#8B5CF6"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="80" cy="95" rx="8" ry="10" fill="#1F2937"/>
+  <ellipse cx="120" cy="95" rx="8" ry="10" fill="#1F2937"/>
+  <circle cx="82" cy="93" r="3" fill="white"/>
+  <circle cx="122" cy="93" r="3" fill="white"/>
+  
+  <!-- Eyebrows -->
+  <path d="M 70 85 Q 80 82, 90 85" stroke="#6B46C1" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 110 85 Q 120 82, 130 85" stroke="#6B46C1" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Nose -->
+  <path d="M 100 105 Q 95 115, 100 115" stroke="#E7A977" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Mouth -->
+  <path d="M 85 125 Q 100 135, 115 125" stroke="#EC4899" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- Hair accessories -->
+  <circle cx="145" cy="85" r="8" fill="#EC4899"/>
+  <circle cx="145" cy="85" r="5" fill="#FDF2F8"/>
+  
+  <!-- Neck -->
+  <rect x="90" y="140" width="20" height="20" fill="#FBBF93"/>
+  
+  <!-- Shirt -->
+  <path d="M 70 155 L 90 155 L 90 165 L 110 165 L 110 155 L 130 155 L 135 180 L 65 180 Z" fill="#C084FC"/>
+  <circle cx="100" cy="170" r="3" fill="#E9D5FF"/>
+</svg>

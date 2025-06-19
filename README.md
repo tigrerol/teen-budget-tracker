@@ -71,12 +71,19 @@ npm run dev
 # Visit http://localhost:3000
 ```
 
-## 📱 Demo Account
+## 📱 User Accounts
 
+### Production Users
+- **Viola** (15 years old) - Default PIN: 1234
+- **Dominic** (17 years old) - Default PIN: 5678
+
+### Demo Account
 - Click **"Try Demo Account"** on the login page
 - No registration required
 - Pre-populated with sample data
 - Full functionality available
+
+**⚠️ Important:** Change the default PINs in production!
 
 ## 🏗️ Architecture
 
@@ -289,6 +296,33 @@ The demo account includes:
 - [ ] Educational content modules
 - [ ] Multi-currency support
 - [ ] Advanced budgeting features
+
+## 🎨 Customizing User Avatars
+
+User avatars are stored as SVG files in `/public/avatars/`. To customize:
+
+### 1. Edit existing avatars
+- Open `/public/avatars/viola-avatar.svg` or `/public/avatars/dominic-avatar.svg`
+- Edit with any SVG editor (Inkscape, Illustrator, or text editor)
+- Keep dimensions at 200x200px for consistency
+
+### 2. Replace with new avatars
+- Create new SVG file with 200x200px dimensions
+- Save with same filename to replace
+- Ensure transparent background
+
+### 3. Avatar guidelines
+- Use simple, clear designs
+- Ensure good contrast with background
+- Keep file size under 50KB
+- Test on both light and dark themes
+
+### 4. Update in production
+After modifying avatars, rebuild the Docker container:
+```bash
+docker build -t teen-budget-tracker .
+docker run -p 3001:3001 -v teen_budget_data:/app/data teen-budget-tracker
+```
 
 ## 🐛 Troubleshooting
 
