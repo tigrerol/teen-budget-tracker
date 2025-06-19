@@ -54,7 +54,7 @@ export function PinPad({ userName, userAvatar, onSubmit, onBack, isLoading, erro
       <CardContent className="space-y-6">
         {/* PIN Display */}
         <div className="flex justify-center space-x-3">
-          {[...Array(maxPinLength)].map((_, i) => (
+          {[...Array(maxPinLength)].map((_: undefined, i: number) => (
             <div
               key={i}
               className="w-12 h-12 border-2 rounded-lg flex items-center justify-center"
@@ -73,7 +73,7 @@ export function PinPad({ userName, userAvatar, onSubmit, onBack, isLoading, erro
 
         {/* Number Pad */}
         <div className="grid grid-cols-3 gap-3">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num: number) => (
             <Button
               key={num}
               variant="outline"

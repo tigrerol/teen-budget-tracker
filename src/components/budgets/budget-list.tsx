@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { BudgetForm } from './budget-form'
 import { formatCurrency } from '@/lib/currency'
+import { BudgetWithTotals, BudgetItem } from '@/types'
 import { 
   Search,
   Filter,
@@ -30,39 +31,10 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 
-interface Budget {
-  id: string
-  name: string
-  period: 'MONTHLY' | 'WEEKLY' | 'YEARLY'
-  startDate: string
-  endDate: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-  budgetItems: Array<{
-    id: string
-    amount: number
-    type: 'INCOME' | 'EXPENSE'
-    notes: string | null
-    category: {
-      id: string
-      name: string
-      icon: string | null
-      color: string | null
-      type: 'INCOME' | 'EXPENSE'
-    }
-  }>
-  totals: {
-    totalIncome: number
-    totalExpenses: number
-    netIncome: number
-    incomeItemCount: number
-    expenseItemCount: number
-  }
-}
+// Using BudgetWithTotals from @/types
 
 interface PaginatedBudgets {
-  data: Budget[]
+  data: BudgetWithTotals[]
   pagination: {
     page: number
     limit: number
@@ -169,11 +141,11 @@ export function BudgetList() {
   })
 
   // Update filters
-  const updateFilter = (key: keyof BudgetFilters, value: any) => {
+  const updateFilter = (key: keyof BudgetFilters, value: string | number) => {
     setFilters(prev => ({
       ...prev,
       [key]: value,
-      page: key !== 'page' ? 1 : value, // Reset to page 1 when filtering
+      page: key !== 'page' ? 1 : typeof value === 'string' ? parseInt(value) : value, // Reset to page 1 when filtering
     }))
   }
 
@@ -336,7 +308,7 @@ export function BudgetList() {
       ) : (
         <div className="space-y-4">
           {/* Budget Cards */}
-          {budgets.map((budget) => (
+          {budgets.map((budget: BudgetWithTotals) => (
             <Card key={budget.id} className="transition-shadow hover:shadow-md">
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -458,7 +430,7 @@ export function BudgetList() {
                   {expandedBudget === budget.id && (
                     <div className="border-t pt-4 space-y-4">
                       {/* Income Items */}
-                      {budget.budgetItems.filter(item => item.type === 'INCOME').length > 0 && (
+                      {budget.budgetItems?.filter((item: any) => item.type === 'INCOME').length && budget.budgetItems.filter((item: any) => item.type === 'INCOME').length > 0 && (
                         <div>
                           <h4 className="font-medium text-green-600 mb-2 flex items-center">
                             <TrendingUp className="h-4 w-4 mr-2" />
@@ -466,16 +438,16 @@ export function BudgetList() {
                           </h4>
                           <div className="grid gap-2 md:grid-cols-2">
                             {budget.budgetItems
-                              .filter(item => item.type === 'INCOME')
-                              .map(item => (
+                              ?.filter((item: any) => item.type === 'INCOME')
+                              .map((item: any) => (
                                 <div key={item.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                                   <div className="flex items-center space-x-2">
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                                      item.category.color || 'bg-gray-100 text-gray-800'
+                                      item.category?.color || 'bg-gray-100 text-gray-800'
                                     }`}>
-                                      {item.category.icon || '💰'}
+                                      {item.category?.icon || '💰'}
                                     </div>
-                                    <span className="text-sm font-medium">{item.category.name}</span>
+                                    <span className="text-sm font-medium">{item.category?.name}</span>
                                   </div>
                                   <span className="font-semibold text-green-600">
                                     {formatCurrency(item.amount)}
@@ -487,7 +459,7 @@ export function BudgetList() {
                       )}
 
                       {/* Expense Items */}
-                      {budget.budgetItems.filter(item => item.type === 'EXPENSE').length > 0 && (
+                      {budget.budgetItems?.filter((item: any) => item.type === 'EXPENSE').length && budget.budgetItems.filter((item: any) => item.type === 'EXPENSE').length > 0 && (
                         <div>
                           <h4 className="font-medium text-red-600 mb-2 flex items-center">
                             <TrendingDown className="h-4 w-4 mr-2" />
@@ -495,16 +467,16 @@ export function BudgetList() {
                           </h4>
                           <div className="grid gap-2 md:grid-cols-2">
                             {budget.budgetItems
-                              .filter(item => item.type === 'EXPENSE')
-                              .map(item => (
+                              ?.filter((item: any) => item.type === 'EXPENSE')
+                              .map((item: any) => (
                                 <div key={item.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                                   <div className="flex items-center space-x-2">
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                                      item.category.color || 'bg-gray-100 text-gray-800'
+                                      item.category?.color || 'bg-gray-100 text-gray-800'
                                     }`}>
-                                      {item.category.icon || '💸'}
+                                      {item.category?.icon || '💸'}
                                     </div>
-                                    <span className="text-sm font-medium">{item.category.name}</span>
+                                    <span className="text-sm font-medium">{item.category?.name}</span>
                                   </div>
                                   <span className="font-semibold text-red-600">
                                     {formatCurrency(item.amount)}

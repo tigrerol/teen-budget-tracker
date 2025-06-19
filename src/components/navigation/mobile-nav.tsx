@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { LucideIcon } from 'lucide-react'
 import { 
   Home, 
   PiggyBank, 
@@ -12,7 +13,13 @@ import {
   Tags
 } from 'lucide-react'
 
-const navItems = [
+interface NavItem {
+  label: string
+  href: string
+  icon: LucideIcon
+}
+
+const navItems: NavItem[] = [
   {
     label: 'Home',
     href: '/',
@@ -52,7 +59,7 @@ export function MobileNav() {
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
       <div className="grid grid-cols-4 h-16">
-        {navItems.map((item) => {
+        {navItems.map((item: NavItem) => {
           const Icon = item.icon
           const isActive = pathname === item.href || 
             (item.href !== '/' && pathname.startsWith(item.href))

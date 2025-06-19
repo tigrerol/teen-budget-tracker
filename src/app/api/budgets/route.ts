@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { CreateBudgetSchema, BudgetFiltersSchema } from '@/lib/validations'
+import { BudgetItem, BudgetTotals, Category } from '@/types'
 import { z } from 'zod'
 
 // GET /api/budgets - Get user's budgets with pagination and filtering
@@ -89,12 +90,12 @@ export async function GET(request: NextRequest) {
     })
 
     // Calculate budget totals
-    const budgetsWithTotals = budgets.map(budget => {
-      const incomeItems = budget.budgetItems.filter(item => item.type === 'INCOME')
-      const expenseItems = budget.budgetItems.filter(item => item.type === 'EXPENSE')
+    const budgetsWithTotals = budgets.map((budget: any) => {
+      const incomeItems = budget.budgetItems.filter((item: any) => item.type === 'INCOME')
+      const expenseItems = budget.budgetItems.filter((item: any) => item.type === 'EXPENSE')
       
-      const totalIncome = incomeItems.reduce((sum, item) => sum + item.amount, 0)
-      const totalExpenses = expenseItems.reduce((sum, item) => sum + item.amount, 0)
+      const totalIncome = incomeItems.reduce((sum: number, item: any) => sum + item.amount, 0)
+      const totalExpenses = expenseItems.reduce((sum: number, item: any) => sum + item.amount, 0)
       const netIncome = totalIncome - totalExpenses
 
       return {
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
     const validatedData = CreateBudgetSchema.parse(body)
 
     // Check if categories belong to the user
-    const categoryIds = validatedData.budgetItems.map(item => item.categoryId)
+    const categoryIds = validatedData.budgetItems.map((item: any) => item.categoryId)
     const categories = await prisma.category.findMany({
       where: {
         id: { in: categoryIds },
@@ -190,7 +191,7 @@ export async function POST(request: NextRequest) {
         endDate: new Date(validatedData.endDate),
         userId: user.id,
         budgetItems: {
-          create: validatedData.budgetItems.map(item => ({
+          create: validatedData.budgetItems.map((item: any) => ({
             categoryId: item.categoryId,
             amount: item.amount,
             type: item.type,

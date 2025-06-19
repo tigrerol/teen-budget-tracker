@@ -77,35 +77,35 @@ async function createSampleData(userId: string) {
       type: 'INCOME',
       description: 'Weekly allowance',
       date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
-      categoryId: incomeCategories.find(c => c.name === 'Allowance')?.id || incomeCategories[0].id,
+      categoryId: incomeCategories.find((c: any) => c.name === 'Allowance')?.id || incomeCategories[0].id,
     },
     {
       amount: 15.50,
       type: 'EXPENSE',
       description: 'Lunch with friends',
       date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-      categoryId: expenseCategories.find(c => c.name === 'Food & Drinks')?.id || expenseCategories[0].id,
+      categoryId: expenseCategories.find((c: any) => c.name === 'Food & Drinks')?.id || expenseCategories[0].id,
     },
     {
       amount: 50.00,
       type: 'INCOME',
       description: 'Part-time work payment',
       date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-      categoryId: incomeCategories.find(c => c.name === 'Part-time Job')?.id || incomeCategories[0].id,
+      categoryId: incomeCategories.find((c: any) => c.name === 'Part-time Job')?.id || incomeCategories[0].id,
     },
     {
       amount: 29.99,
       type: 'EXPENSE',
       description: 'New t-shirt',
       date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-      categoryId: expenseCategories.find(c => c.name === 'Clothes')?.id || expenseCategories[0].id,
+      categoryId: expenseCategories.find((c: any) => c.name === 'Clothes')?.id || expenseCategories[0].id,
     },
     {
       amount: 12.00,
       type: 'EXPENSE',
       description: 'Movie ticket',
       date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 2 weeks ago
-      categoryId: expenseCategories.find(c => c.name === 'Entertainment')?.id || expenseCategories[0].id,
+      categoryId: expenseCategories.find((c: any) => c.name === 'Entertainment')?.id || expenseCategories[0].id,
     },
   ]
   

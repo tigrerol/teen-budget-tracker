@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CategoryForm } from '@/components/categories/category-form'
+import { Category } from '@/types'
 import { 
   Plus,
   Edit,
@@ -27,8 +28,8 @@ export default function CategoriesPage() {
     enabled: !!session,
   })
 
-  const incomeCategories = categories.filter((cat: any) => cat.type === 'INCOME')
-  const expenseCategories = categories.filter((cat: any) => cat.type === 'EXPENSE')
+  const incomeCategories = categories.filter((cat: Category) => cat.type === 'INCOME')
+  const expenseCategories = categories.filter((cat: Category) => cat.type === 'EXPENSE')
 
   if (isLoading) {
     return (
@@ -80,7 +81,7 @@ export default function CategoriesPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {incomeCategories.map((category: any) => (
+            {incomeCategories.map((category: Category & { _count?: { transactions: number } }) => (
               <div
                 key={category.id}
                 className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow"
@@ -131,7 +132,7 @@ export default function CategoriesPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {expenseCategories.map((category: any) => (
+            {expenseCategories.map((category: Category & { _count?: { transactions: number } }) => (
               <div
                 key={category.id}
                 className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow"

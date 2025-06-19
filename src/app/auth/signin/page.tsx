@@ -48,7 +48,7 @@ export default function SignInPage() {
       if (response.ok) {
         const data = await response.json()
         const ids: Record<string, string> = {}
-        data.users.forEach((user: any) => {
+        data.users.forEach((user: { id: string; name: string }) => {
           if (user.name === 'Viola') ids.viola = user.id
           if (user.name === 'Dominic') ids.dominic = user.id
         })
@@ -121,7 +121,7 @@ export default function SignInPage() {
       {!selectedUser ? (
         <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            {USERS.map((user) => (
+            {USERS.map((user: User) => (
               <UserProfileCard
                 key={user.id}
                 name={user.name}

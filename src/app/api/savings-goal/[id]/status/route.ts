@@ -85,7 +85,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     })
 
     // Calculate current amount and progress
-    const currentAmount = updatedSavingsGoal.transactions.reduce((sum, transaction) => sum + transaction.amount, 0)
+    const currentAmount = updatedSavingsGoal.transactions.reduce((sum: number, transaction: any) => sum + transaction.amount, 0)
     const progress = (currentAmount / updatedSavingsGoal.targetAmount) * 100
     const isDeadlineMissed = updatedSavingsGoal.deadline ? new Date() > updatedSavingsGoal.deadline : false
 

@@ -1,0 +1,19 @@
+# Use the current working image as base
+FROM tigreroll/teen-budget-tracker:v1.0.0
+
+# Switch to root to install packages
+USER root
+
+# Install sqlite3 and tsx
+RUN apk add --no-cache sqlite && \
+    npm install tsx@4.20.3 --no-save
+
+# Fix the entrypoint script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
+# Switch back to nextjs user
+USER nextjs
+
+# Use the fixed entrypoint
+CMD ["/app/docker-entrypoint.sh"]

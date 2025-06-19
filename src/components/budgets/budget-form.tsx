@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/currency'
+import { Category, BudgetItem, Budget } from '@/types'
 import { 
   Plus, 
   Trash2, 
@@ -23,11 +24,7 @@ import {
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, addMonths, getMonth, getYear } from 'date-fns'
 
-interface BudgetItem {
-  categoryId: string
-  amount: number
-  type: 'INCOME' | 'EXPENSE'
-}
+// Remove local interface - using the one from @/types
 
 interface BudgetFormData {
   name: string
@@ -230,7 +227,7 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
   const addBudgetItem = (type: 'INCOME' | 'EXPENSE') => {
     const availableCategories = categories.filter((cat: any) => 
       cat.type === type && 
-      !formData.budgetItems.some(item => item.categoryId === cat.id)
+      !formData.budgetItems.some((item: any) => item.categoryId === cat.id)
     )
 
     if (availableCategories.length === 0) {
@@ -254,23 +251,23 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
   const removeBudgetItem = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      budgetItems: prev.budgetItems.filter((_, i) => i !== index),
+      budgetItems: prev.budgetItems.filter((_: BudgetItem, i: number) => i !== index),
     }))
   }
 
   const updateBudgetItem = (index: number, updates: Partial<BudgetItem>) => {
     setFormData(prev => ({
       ...prev,
-      budgetItems: prev.budgetItems.map((item, i) => 
+      budgetItems: prev.budgetItems.map((item: BudgetItem, i: number) => 
         i === index ? { ...item, ...updates } : item
       ),
     }))
   }
 
-  const incomeItems = formData.budgetItems.filter(item => item.type === 'INCOME')
-  const expenseItems = formData.budgetItems.filter(item => item.type === 'EXPENSE')
-  const totalIncome = incomeItems.reduce((sum, item) => sum + (item.amount || 0), 0)
-  const totalExpenses = expenseItems.reduce((sum, item) => sum + (item.amount || 0), 0)
+  const incomeItems = formData.budgetItems.filter((item: BudgetItem) => item.type === 'INCOME')
+  const expenseItems = formData.budgetItems.filter((item: BudgetItem) => item.type === 'EXPENSE')
+  const totalIncome = incomeItems.reduce((sum: number, item: BudgetItem) => sum + (item.amount || 0), 0)
+  const totalExpenses = expenseItems.reduce((sum: number, item: BudgetItem) => sum + (item.amount || 0), 0)
   const netIncome = totalIncome - totalExpenses
 
   return (
@@ -383,11 +380,11 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {incomeItems.map((item, index) => {
+              {incomeItems.map((item: BudgetItem, index: number) => {
                 const actualIndex = formData.budgetItems.findIndex(
-                  (budgetItem, i) => budgetItem === item
+                  (budgetItem: BudgetItem, i: number) => budgetItem === item
                 )
-                const category = categories.find((cat: any) => cat.id === item.categoryId)
+                const category = categories.find((cat: Category) => cat.id === item.categoryId)
                 
                 return (
                   <div key={actualIndex} className="flex items-center space-x-3 p-4 border rounded-lg">
@@ -407,12 +404,12 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
                         </SelectTrigger>
                         <SelectContent>
                           {categories
-                            .filter((cat: any) => cat.type === 'INCOME')
-                            .filter((cat: any) => 
+                            .filter((cat: Category) => cat.type === 'INCOME')
+                            .filter((cat: Category) => 
                               cat.id === item.categoryId || 
-                              !formData.budgetItems.some(bi => bi.categoryId === cat.id)
+                              !formData.budgetItems.some((bi: BudgetItem) => bi.categoryId === cat.id)
                             )
-                            .map((category: any) => (
+                            .map((category: Category) => (
                               <SelectItem key={category.id} value={category.id}>
                                 <span className="flex items-center">
                                   {category.icon && <span className="mr-2">{category.icon}</span>}
@@ -477,11 +474,11 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {expenseItems.map((item, index) => {
+              {expenseItems.map((item: BudgetItem, index: number) => {
                 const actualIndex = formData.budgetItems.findIndex(
-                  (budgetItem, i) => budgetItem === item
+                  (budgetItem: BudgetItem, i: number) => budgetItem === item
                 )
-                const category = categories.find((cat: any) => cat.id === item.categoryId)
+                const category = categories.find((cat: Category) => cat.id === item.categoryId)
                 
                 return (
                   <div key={actualIndex} className="flex items-center space-x-3 p-4 border rounded-lg">
@@ -501,12 +498,12 @@ export function BudgetForm({ budgetId, trigger, onSuccess }: BudgetFormProps) {
                         </SelectTrigger>
                         <SelectContent>
                           {categories
-                            .filter((cat: any) => cat.type === 'EXPENSE')
-                            .filter((cat: any) => 
+                            .filter((cat: Category) => cat.type === 'EXPENSE')
+                            .filter((cat: Category) => 
                               cat.id === item.categoryId || 
-                              !formData.budgetItems.some(bi => bi.categoryId === cat.id)
+                              !formData.budgetItems.some((bi: BudgetItem) => bi.categoryId === cat.id)
                             )
-                            .map((category: any) => (
+                            .map((category: Category) => (
                               <SelectItem key={category.id} value={category.id}>
                                 <span className="flex items-center">
                                   {category.icon && <span className="mr-2">{category.icon}</span>}

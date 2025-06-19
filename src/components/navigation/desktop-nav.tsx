@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { cn } from '@/lib/utils'
+import { LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { 
   Home, 
@@ -16,7 +17,13 @@ import {
   Tags
 } from 'lucide-react'
 
-const navItems = [
+interface NavItem {
+  label: string
+  href: string
+  icon: LucideIcon
+}
+
+const navItems: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/',
@@ -69,7 +76,7 @@ export function DesktopNav() {
         </div>
 
         <nav className="flex items-center space-x-1 flex-1">
-          {navItems.map((item) => {
+          {navItems.map((item: NavItem) => {
             const Icon = item.icon
             const isActive = pathname === item.href || 
               (item.href !== '/' && pathname.startsWith(item.href))

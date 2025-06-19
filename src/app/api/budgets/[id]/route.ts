@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { UpdateBudgetSchema } from '@/lib/validations'
+import { BudgetItem } from '@/types'
 import { z } from 'zod'
 
 // GET /api/budgets/[id] - Get a specific budget
@@ -67,11 +68,11 @@ export async function GET(
     }
 
     // Calculate budget totals
-    const incomeItems = budget.budgetItems.filter(item => item.type === 'INCOME')
-    const expenseItems = budget.budgetItems.filter(item => item.type === 'EXPENSE')
+    const incomeItems = budget.budgetItems.filter((item: any) => item.type === 'INCOME')
+    const expenseItems = budget.budgetItems.filter((item: any) => item.type === 'EXPENSE')
     
-    const totalIncome = incomeItems.reduce((sum, item) => sum + item.amount, 0)
-    const totalExpenses = expenseItems.reduce((sum, item) => sum + item.amount, 0)
+    const totalIncome = incomeItems.reduce((sum: number, item: any) => sum + item.amount, 0)
+    const totalExpenses = expenseItems.reduce((sum: number, item: any) => sum + item.amount, 0)
     const netIncome = totalIncome - totalExpenses
 
     const budgetWithTotals = {
@@ -142,7 +143,7 @@ export async function PUT(
 
     // If budget items are being updated, validate categories
     if (validatedData.budgetItems) {
-      const categoryIds = validatedData.budgetItems.map(item => item.categoryId)
+      const categoryIds = validatedData.budgetItems.map((item: any) => item.categoryId)
       const categories = await prisma.category.findMany({
         where: {
           id: { in: categoryIds },
@@ -159,7 +160,7 @@ export async function PUT(
     }
 
     // Update budget in a transaction
-    const updatedBudget = await prisma.$transaction(async (tx) => {
+    const updatedBudget = await prisma.$transaction(async (tx: any) => {
       // Update budget basic info
       const budgetUpdateData: any = {}
       if (validatedData.name !== undefined) budgetUpdateData.name = validatedData.name
@@ -182,7 +183,7 @@ export async function PUT(
 
         // Create new budget items
         await tx.budgetItem.createMany({
-          data: validatedData.budgetItems.map(item => ({
+          data: validatedData.budgetItems.map((item: any) => ({
             budgetId: id,
             categoryId: item.categoryId,
             amount: item.amount,

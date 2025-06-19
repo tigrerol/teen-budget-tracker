@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Calculate current amount from linked transactions
-    const currentAmount = savingsGoal.transactions.reduce((sum, transaction) => sum + transaction.amount, 0)
+    const currentAmount = savingsGoal.transactions.reduce((sum: number, transaction: any) => sum + transaction.amount, 0)
     const progress = (currentAmount / savingsGoal.targetAmount) * 100
     const isDeadlineMissed = savingsGoal.deadline ? new Date() > savingsGoal.deadline : false
 
@@ -125,7 +125,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     })
 
     // Calculate current amount and progress
-    const currentAmount = updatedSavingsGoal.transactions.reduce((sum, transaction) => sum + transaction.amount, 0)
+    const currentAmount = updatedSavingsGoal.transactions.reduce((sum: number, transaction: any) => sum + transaction.amount, 0)
     const progress = (currentAmount / updatedSavingsGoal.targetAmount) * 100
     const isDeadlineMissed = updatedSavingsGoal.deadline ? new Date() > updatedSavingsGoal.deadline : false
 

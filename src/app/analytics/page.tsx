@@ -120,7 +120,7 @@ export default function AnalyticsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {monthlyData.map((month, index) => {
+            {monthlyData.map((month: { month: string; income: number; expenses: number }, index: number) => {
               const netIncome = month.income - month.expenses
               const isPositive = netIncome > 0
               
@@ -171,7 +171,7 @@ export default function AnalyticsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {expenseBreakdown.map((item, index) => (
+            {expenseBreakdown.map((item: { category: string; amount: number; percentage: number; color: string }, index: number) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="font-medium">{item.category}</span>

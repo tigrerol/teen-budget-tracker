@@ -4,6 +4,29 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency } from '@/lib/currency'
+
+interface Achievement {
+  id: number
+  title: string
+  description: string
+  icon: string
+  isUnlocked: boolean
+  unlockedAt?: string
+  progress?: number
+  target?: number
+  points: number
+  category: string
+}
+
+interface Goal {
+  id: number
+  title: string
+  target: number
+  current: number
+  deadline: string
+  icon: string
+  isCompleted: boolean
+}
 import { 
   Trophy,
   Target,
@@ -17,7 +40,7 @@ import {
 
 export default function AchievementsPage() {
   // Mock achievements data - will be replaced with real data
-  const achievements = [
+  const achievements: Achievement[] = [
     {
       id: 1,
       title: 'First Steps',
@@ -83,7 +106,7 @@ export default function AchievementsPage() {
     }
   ]
 
-  const goals = [
+  const goals: Goal[] = [
     {
       id: 1,
       title: 'New Sneakers',
@@ -114,10 +137,10 @@ export default function AchievementsPage() {
   ]
 
   const totalPoints = achievements
-    .filter(achievement => achievement.isUnlocked)
-    .reduce((sum, achievement) => sum + achievement.points, 0)
+    .filter((achievement: Achievement) => achievement.isUnlocked)
+    .reduce((sum: number, achievement: Achievement) => sum + achievement.points, 0)
 
-  const unlockedCount = achievements.filter(achievement => achievement.isUnlocked).length
+  const unlockedCount = achievements.filter((achievement: Achievement) => achievement.isUnlocked).length
   const totalAchievements = achievements.length
 
   return (
@@ -173,7 +196,7 @@ export default function AchievementsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {goals.filter(goal => !goal.isCompleted).length}
+              {goals.filter((goal: Goal) => !goal.isCompleted).length}
             </div>
             <p className="text-xs text-muted-foreground">
               In progress
@@ -192,7 +215,7 @@ export default function AchievementsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {goals.map((goal) => {
+            {goals.map((goal: Goal) => {
               const progress = (goal.current / goal.target) * 100
               const isCompleted = goal.isCompleted
               
@@ -243,7 +266,7 @@ export default function AchievementsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
-            {achievements.map((achievement) => (
+            {achievements.map((achievement: Achievement) => (
               <div 
                 key={achievement.id} 
                 className={`p-4 rounded-lg border ${

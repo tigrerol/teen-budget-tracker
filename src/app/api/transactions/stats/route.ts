@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { Transaction } from '@/types'
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,43 +48,43 @@ export async function GET(request: NextRequest) {
     })
 
     // Calculate total balance (all time)
-    const totalBalance = allTransactions.reduce((sum, transaction) => {
+    const totalBalance = allTransactions.reduce((sum: number, transaction: any) => {
       return transaction.type === 'INCOME' 
         ? sum + transaction.amount 
         : sum - transaction.amount
     }, 0)
 
     // Filter transactions for current month
-    const currentMonthTransactions = allTransactions.filter(t => {
+    const currentMonthTransactions = allTransactions.filter((t: any) => {
       const transactionDate = new Date(t.date)
       return transactionDate >= currentMonthStart && transactionDate <= currentMonthEnd
     })
 
     // Filter transactions for previous month
-    const previousMonthTransactions = allTransactions.filter(t => {
+    const previousMonthTransactions = allTransactions.filter((t: any) => {
       const transactionDate = new Date(t.date)
       return transactionDate >= previousMonthStart && transactionDate <= previousMonthEnd
     })
 
     // Calculate current month stats
     const monthlyIncome = currentMonthTransactions
-      .filter(t => t.type === 'INCOME')
-      .reduce((sum, t) => sum + t.amount, 0)
+      .filter((t: any) => t.type === 'INCOME')
+      .reduce((sum: number, t: any) => sum + t.amount, 0)
 
     const monthlyExpenses = currentMonthTransactions
-      .filter(t => t.type === 'EXPENSE')
-      .reduce((sum, t) => sum + t.amount, 0)
+      .filter((t: any) => t.type === 'EXPENSE')
+      .reduce((sum: number, t: any) => sum + t.amount, 0)
 
     const currentMonthBalance = monthlyIncome - monthlyExpenses
 
     // Calculate previous month balance
     const previousMonthIncome = previousMonthTransactions
-      .filter(t => t.type === 'INCOME')
-      .reduce((sum, t) => sum + t.amount, 0)
+      .filter((t: any) => t.type === 'INCOME')
+      .reduce((sum: number, t: any) => sum + t.amount, 0)
 
     const previousMonthExpenses = previousMonthTransactions
-      .filter(t => t.type === 'EXPENSE')
-      .reduce((sum, t) => sum + t.amount, 0)
+      .filter((t: any) => t.type === 'EXPENSE')
+      .reduce((sum: number, t: any) => sum + t.amount, 0)
 
     const previousMonthBalance = previousMonthIncome - previousMonthExpenses
 

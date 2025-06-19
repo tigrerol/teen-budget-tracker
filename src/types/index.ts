@@ -36,15 +36,58 @@ export interface Transaction {
 
 export interface Budget {
   id: string
-  amount: number
-  period: 'MONTHLY' | 'WEEKLY' | 'DAILY'
-  categoryId: string
+  name: string
+  amount?: number // Legacy field, may not be present in new budgets
+  period: 'MONTHLY' | 'WEEKLY' | 'YEARLY'
+  categoryId?: string // Legacy field
   userId: string
-  startDate: Date
-  endDate: Date
+  startDate: Date | string
+  endDate: Date | string
+  isActive: boolean
   createdAt: Date
   updatedAt: Date
   category?: Category
+  budgetItems?: BudgetItem[]
+  totals?: BudgetTotals
+}
+
+export interface BudgetItem {
+  id?: string
+  budgetId?: string
+  categoryId: string
+  amount: number
+  type: 'INCOME' | 'EXPENSE'
+  createdAt?: Date
+  updatedAt?: Date
+  category?: Category
+}
+
+export interface BudgetTotals {
+  totalIncome: number
+  totalExpenses: number
+  netIncome: number
+  incomeItemCount: number
+  expenseItemCount: number
+}
+
+export interface BudgetWithTotals extends Budget {
+  totals: BudgetTotals
+}
+
+export interface SavingsGoal {
+  id: string
+  name: string
+  targetAmount: number
+  currentAmount?: number
+  deadline?: Date | null
+  status: 'ACTIVE' | 'COMPLETED' | 'PAUSED'
+  priority: 'LOW' | 'MEDIUM' | 'HIGH'
+  userId: string
+  createdAt: Date
+  updatedAt: Date
+  progress?: number
+  isDeadlineMissed?: boolean
+  transactions?: Transaction[]
 }
 
 // DTO types for API requests
@@ -78,18 +121,37 @@ export interface UpdateCategoryDto {
 }
 
 export interface CreateBudgetDto {
-  amount: number
-  period: 'MONTHLY' | 'WEEKLY' | 'DAILY'
-  categoryId: string
+  name: string
+  period: 'MONTHLY' | 'WEEKLY' | 'YEARLY'
   startDate: string
   endDate: string
+  budgetItems: BudgetItem[]
 }
 
 export interface UpdateBudgetDto {
-  amount?: number
-  period?: 'MONTHLY' | 'WEEKLY' | 'DAILY'
+  name?: string
+  period?: 'MONTHLY' | 'WEEKLY' | 'YEARLY'
   startDate?: string
   endDate?: string
+  isActive?: boolean
+  budgetItems?: BudgetItem[]
+}
+
+export interface CreateSavingsGoalDto {
+  name: string
+  targetAmount: number
+  deadline?: string | null
+  priority: 'LOW' | 'MEDIUM' | 'HIGH'
+}
+
+export interface TransactionStats {
+  totalBalance: number
+  monthlyIncome: number
+  monthlyExpenses: number
+  currentMonthBalance: number
+  previousMonthBalance: number
+  balanceChange: number
+  balanceChangePercent: number
 }
 
 // Utility types

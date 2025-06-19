@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { CreateSavingsGoalSchema } from '@/lib/validations'
+import { Transaction } from '@/types'
 import { z } from 'zod'
 
 // GET /api/savings-goal - Get user's active savings goal
@@ -35,7 +36,7 @@ export async function GET() {
     }
 
     // Calculate current amount from linked transactions
-    const currentAmount = savingsGoal.transactions.reduce((sum, transaction) => sum + transaction.amount, 0)
+    const currentAmount = savingsGoal.transactions.reduce((sum: number, transaction: any) => sum + transaction.amount, 0)
     const progress = (currentAmount / savingsGoal.targetAmount) * 100
     const isDeadlineMissed = savingsGoal.deadline ? new Date() > savingsGoal.deadline : false
 
