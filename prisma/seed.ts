@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -137,13 +138,56 @@ async function main() {
   
   console.log('Demo user:', demoUser.email)
   
-  // Create default categories
-  await createDefaultCategories(demoUser.id)
+  // Create Viola user with PIN 1234
+  const violaPin = await bcrypt.hash('1234', 12)
+  const viola = await prisma.user.upsert({
+    where: { email: 'viola@teen-budget.app' },
+    update: {
+      pin: violaPin,
+      avatar: '/avatars/viola-avatar.svg'
+    },
+    create: {
+      email: 'viola@teen-budget.app',
+      name: 'Viola',
+      pin: violaPin,
+      avatar: '/avatars/viola-avatar.svg'
+    }
+  })
   
-  // Create sample data
+  console.log('Viola user created:', viola.email)
+  
+  // Create Dominic user with PIN 5678
+  const dominicPin = await bcrypt.hash('5678', 12)
+  const dominic = await prisma.user.upsert({
+    where: { email: 'dominic@teen-budget.app' },
+    update: {
+      pin: dominicPin,
+      avatar: '/avatars/dominic-avatar.svg'
+    },
+    create: {
+      email: 'dominic@teen-budget.app',
+      name: 'Dominic',
+      pin: dominicPin,
+      avatar: '/avatars/dominic-avatar.svg'
+    }
+  })
+  
+  console.log('Dominic user created:', dominic.email)
+  
+  // Create default categories for all users
+  await createDefaultCategories(demoUser.id)
+  await createDefaultCategories(viola.id)
+  await createDefaultCategories(dominic.id)
+  
+  // Create sample data for all users
   await createSampleData(demoUser.id)
+  await createSampleData(viola.id)
+  await createSampleData(dominic.id)
   
   console.log('✅ Database seeded successfully!')
+  console.log('🔐 Login credentials:')
+  console.log('  - Viola: PIN 1234')
+  console.log('  - Dominic: PIN 5678')
 }
 
 main()

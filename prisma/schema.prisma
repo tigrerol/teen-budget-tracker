@@ -92,7 +92,7 @@ model Transaction {
   id          String   @id @default(cuid())
   amount      Float
   type        String   // "INCOME" | "EXPENSE"
-  description String
+  description String?
   date        DateTime
   categoryId    String
   userId        String

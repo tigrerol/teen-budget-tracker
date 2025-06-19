@@ -10,7 +10,7 @@ export const SavingsGoalStatusSchema = z.enum(['ACTIVE', 'ACHIEVED', 'DISCARDED'
 export const CreateTransactionSchema = z.object({
   amount: z.number().positive('Amount must be positive'),
   type: TransactionTypeSchema,
-  description: z.string().min(1, 'Description is required').max(255, 'Description too long'),
+  description: z.string().max(255, 'Description too long').optional(),
   date: z.string().datetime().or(z.date()),
   categoryId: z.string().cuid('Invalid category ID'),
   savingsGoalId: z.string().cuid('Invalid savings goal ID').optional(),

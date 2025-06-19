@@ -21,7 +21,7 @@ if [ "$DB_EXISTS" = false ]; then
     node -e "
     const { execSync } = require('child_process');
     try {
-      execSync('npx tsx prisma/seed-production.ts', { stdio: 'inherit' });
+      execSync('npx tsx prisma/seed.ts', { stdio: 'inherit' });
     } catch (error) {
       console.error('Production seeding failed:', error);
       process.exit(1);

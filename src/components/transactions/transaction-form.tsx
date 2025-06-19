@@ -213,9 +213,6 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
       newErrors.amount = 'Amount must be greater than 0'
     }
 
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required'
-    }
 
     if (!formData.categoryId) {
       newErrors.categoryId = 'Category is required'
@@ -401,7 +398,7 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Description (Optional)</Label>
               <Textarea
                 id="description"
                 placeholder="What was this transaction for?"

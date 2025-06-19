@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  teen-budget-tracker:
+    image: tigreroll/teen-budget-tracker:latest
+    container_name: teen-budget-tracker
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/teen-budget.db
+      # IMPORTANT: Change these values before deployment!
+      - NEXTAUTH_URL=http://YOUR_NAS_IP:3001  # Replace with your Synology NAS IP
+      - NEXTAUTH_SECRET=CHANGE_THIS_TO_A_SECURE_RANDOM_STRING  # Generate a secure secret!
+      # Optional: Enable if you want to use OAuth providers
+      # - GOOGLE_CLIENT_ID=your_google_client_id
+      # - GOOGLE_CLIENT_SECRET=your_google_client_secret
+    volumes:
+      # Map the database to a location on your Synology NAS
+      # Change /volume1/docker/teen-budget-tracker to your preferred path
+      - /volume1/docker/teen-budget-tracker:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://0.0.0.0:3001/api/auth/session"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Resource limits for Synology DS918+ (adjust based on your usage)
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Note: No volumes section needed since we're using bind mounts
+# This gives you direct access to the database file for backups

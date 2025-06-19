@@ -60,8 +60,9 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/tsx ./node_modules/tsx
 
-# Install prisma CLI for db push
-RUN npm install prisma@6.10.0 --no-save
+# Install required CLI tools
+RUN apk add --no-cache sqlite && \
+    npm install prisma@6.10.0 tsx@4.20.3 --no-save
 
 # Copy startup script
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
