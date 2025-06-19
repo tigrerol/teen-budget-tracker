@@ -146,6 +146,8 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['budget-overview'] })
       queryClient.invalidateQueries({ queryKey: ['savings-goal'] })
       setOpen(false)
       resetForm()
@@ -183,6 +185,8 @@ export function TransactionForm({ trigger, transactionId, onSuccess }: Transacti
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['transaction', transactionId] })
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['budget-overview'] })
       queryClient.invalidateQueries({ queryKey: ['savings-goal'] })
       setOpen(false)
       onSuccess?.()

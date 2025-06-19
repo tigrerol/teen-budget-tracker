@@ -34,13 +34,25 @@ export function useBudgetOverview() {
       const result = await response.json()
       const budgets = result.data || []
       
-      // Get current month transactions for budget comparison
-      const now = new Date()
-      const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-      const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      // If no budgets, return empty array
+      if (budgets.length === 0) {
+        return []
+      }
       
+      // Find the date range for all active budgets to fetch relevant transactions
+      let earliestDate = new Date(budgets[0].startDate)
+      let latestDate = new Date(budgets[0].endDate)
+      
+      for (const budget of budgets) {
+        const startDate = new Date(budget.startDate)
+        const endDate = new Date(budget.endDate)
+        if (startDate < earliestDate) earliestDate = startDate
+        if (endDate > latestDate) latestDate = endDate
+      }
+      
+      // Fetch transactions for the full budget period range
       const transactionsResponse = await fetch(
-        `/api/transactions?startDate=${currentMonthStart.toISOString()}&endDate=${currentMonthEnd.toISOString()}&limit=1000`
+        `/api/transactions?startDate=${earliestDate.toISOString()}&endDate=${latestDate.toISOString()}&limit=1000`
       )
       
       const transactionResult = transactionsResponse.ok 

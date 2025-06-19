@@ -142,6 +142,8 @@ export function TransactionList() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['budget-overview'] })
     },
   })
 
